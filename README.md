@@ -19,9 +19,22 @@ an identified for the sequence, the name of the gene, a "fold change value" and 
 of the significance of the different between the conditions.  The fold change is the ratio
 of amounts between the conditions, and the p-value is calculated using a standard Student's *t*-test.
 
+The p-values in that file are just the raw p-values from the *t*-text, and so are likely to be 
+misleading bacaise there are so many tests, that some of them are likely to indicate significance
+purely by chance.  We normally correct for this using a method to adjust the p-values.  In this 
+case, we used the Benjamini-Hochberg method to re-calculate the p-value to ensure that the 
+false discovery rate (FDR - the proportion of comparisons which appear significant purely
+by chance), to give a q-value we can use instead. For this data, corrected\_RNAseq\_data.txt 
+contains a column with the q-values as well.
+
 ## Sheep GWAs Data
 
 sheepdata.txt contains (again, after the header line) lines with 37 columns. The first column is 
 the identifier of a particular mutation in the sheep genome (more correctly, a Single 
 Nucleotide Polymorphism) and it is followed by 36 p-values which indicate the degree of
 association with each of 36 different climatic parameters.
+
+## The weather Script
+
+"weather" contains the python code which generates the page at http://bioltfws1.york.ac.uk/cgi-bin/weather 
+by scraping data from the Met Office web service.
