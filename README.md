@@ -22,6 +22,6 @@ of amounts between the conditions, and the p-value is calculated using a standar
 ## Sheep GWAs Data
 
 sheepdata.txt contains (again, after the header line) lines with 37 columns. The first column is 
-the identified of a particular mutation in the sheep genome (more correctly, a Single 
+the identifier of a particular mutation in the sheep genome (more correctly, a Single 
 Nucleotide Polymorphism) and it is followed by 36 p-values which indicate the degree of
 association with each of 36 different climatic parameters.
