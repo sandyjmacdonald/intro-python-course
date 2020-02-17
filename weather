@@ -1,0 +1,81 @@
+#!/bin/env python
+
+from __future__ import print_function
+import urllib2		# Modules for performing web requests and getting data back
+import json		# Module for handling complex data in JSON format, and converting it to Python lists and dictionaries
+
+# Print out the http content type header, to make sure that the contents are handled as plain text
+
+print("Content-type: text/plain\n")
+
+# Get a list of the available observation dates and times and use not the latest, but the one before that
+
+weatherHandle = urllib2.urlopen("http://datapoint.metoffice.gov.uk/public/data/val/wxobs/all/json/capabilities?res=hourly&key=7ed9189d-6f69-47bc-92f7-d1374c7285d6")
+weatherText = weatherHandle.readline()
+observations = json.loads(weatherText)
+lastObservationDate = observations['Resource']['TimeSteps']['TS'][-2]
+
+# Now read the observation data for all weather stations for the date and time we got above
+
+try:
+    weatherHandle = urllib2.urlopen("http://datapoint.metoffice.gov.uk/public/data/val/wxobs/all/json/all?res=hourly&time=%s&key=7ed9189d-6f69-47bc-92f7-d1374c7285d6" % observations['Resource']['TimeSteps']['TS'][-1])
+except:
+    try:
+        weatherHandle = urllib2.urlopen("http://datapoint.metoffice.gov.uk/public/data/val/wxobs/all/json/all?res=hourly&time=%s&key=7ed9189d-6f69-47bc-92f7-d1374c7285d6" % observations['Resource']['TimeSteps']['TS'][-2])
+    except:
+        weatherHandle = urllib2.urlopen("http://datapoint.metoffice.gov.uk/public/data/val/wxobs/all/json/all?res=hourly&time=%s&key=7ed9189d-6f69-47bc-92f7-d1374c7285d6" % observations['Resource']['TimeSteps']['TS'][-3])
+
+weatherText = weatherHandle.readline()
+weather = json.loads(weatherText)
+
+# Define a list of weather descriptions (taken from the Met Office website) for the weather type codes used in the
+# observations
+
+weatherDescriptions = ["Clear Night", "Sunny Day", "Partly Cloudy (night)", "Partly Cloudy (day)", "Not used", "Mist",
+			"Fog", "Cloudy", "Overcast", "Light Rain Shower (night)", "Light Rain Shower (day)", "Drizzle",
+			"Light Rain", "Heavy Rain Shower (night)", "Heavy Rain Shower (day)", "Heavy Rain", "Sleet Shower (night)",
+			"Sleet Shower (day)", "Sleet", "Hail Shower (night)", "Hail Shower (day)", "Hail", 
+			"Light Snow Shower (night)", "Light Snow Shower (day)", "Light Snow", "Heavy Show Shower (night)", 
+			"Heavy Snow Shower (day)", "Heavy Snow", "Thunder Shower (night)", "Thunder Shower (day)", "Thunder"]
+
+# Print a header line
+
+print("Latitude\tLongitude\tCountry\tLocation\tTemperature (C)\tWind Speed (mph)\tWind Direction\tWind Gust (mph)\tVisibility (m)\tPressure (hPa)\tPressure Tendency\tHumidity\tUV Index\tPrecipitation Probability (%)\tFeels-like Temperature\tWeather Type\tWeather Description\tElevation (m)")
+
+# Collect the observations into a dictionary of dictionaries, keyed by the country and location name
+
+countries = {}
+for location in weather['SiteRep']['DV']['Location']:
+    if location['country'] not in countries:
+        countries[location['country']] = {}
+    countries[location['country']][location['name']] = location
+
+# Now produce a single line for each observation, with the latitude, longitude, country and location followed by the report fields
+# with the following keys
+
+reportKeys = ["T", "S", "D", "G", "V", "P", "Pt", "H", "U", "Pp", "F", "W"]
+for country in sorted(countries.keys()):
+    for location in sorted(countries[country].keys()):
+        site = countries[country][location]
+        values = [site['lat'], site['lon'], country.title(), location.title()]
+        if 'Rep' in site['Period']:
+            report = site['Period']['Rep']
+            if isinstance(report, dict):
+                for reportKey in reportKeys:
+                    if reportKey in report:
+                        values.append(report[reportKey])
+                    else:
+                        values.append("n/a")
+                if "W" in report:
+                    weatherType = weatherDescriptions[int(report["W"])]
+                    values.append(weatherType)
+                else:
+                    values.append("n/a")
+            else:
+                for i in range(len(reportKeys) + 1):
+                    values.append("n/a")
+        else:
+	    nullValues = ['n/a'] * (len(reportKeys) + 1)
+            values.extend(nullValues)
+        values.append(site['elevation'])
+        print("\t".join(values))
