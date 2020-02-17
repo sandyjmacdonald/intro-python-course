@@ -17,7 +17,7 @@ RNA for different genes in cells under different conditions.  The format is that
 (after the first line which contains the names of the different columns) contains four values: 
 an identified for the sequence, the name of the gene, a "fold change value" and the p-value 
 of the significance of the different between the conditions.  The fold change is the ratio
-of amounts between the conditions, and the p-value is calculated using a standard Student's /t/-test.
+of amounts between the conditions, and the p-value is calculated using a standard Student's *t*-test.
 
 ## Sheep GWAs Data
 
