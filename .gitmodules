@@ -1,0 +1,3 @@
+[submodule "met-office-weather"]
+	path = met-office-weather
+	url = https://github.com/sandyjmacdonald/met-office-weather
