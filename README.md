@@ -30,6 +30,11 @@ the false discovery rate (FDR - the proportion of comparisons which appear signi
 by chance) is a reliable value that we can use instead. For this reason, the
 `corrected_rna_seq_data.txt` file contains a column with the q-values as well.
 
+## Shakespeare Plays and Sonnets
+
+The file `complete_works_shakespeare.txt` contains the text of Shakespeare's plays and sonnets, as
+an example of a text corpus for analysis.
+
 ## Met Office Weather Data
 
 `met-office-weather` contains the Python code which generates the page at
